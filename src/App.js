@@ -4,14 +4,21 @@ import axios from 'axios';
 import React, { useState, useEffect } from "react"
 function App() {
   const [image, setImage] = useState("")
+  const [imageURL,setImageURL] = useState("")
+  const [text,setText] = useState("")
   const handleSubmit = async(e)=>{
     e.preventDefault()
     // console.log("heloo")
     try {
-      const res = await axios.post("https://reqres.in/api/users/",{name:"John", job:"ehllo"})
-      console.log(res.data);
+      const res = await axios.post("http://127.0.0.1:5000/api/recognize",{img:imageURL},{
+        headers: {
+            'Content-Type': 'application/json',
+        }
+      })
+      console.log(res.data)
+      setText(res.data.predicted_all);
     } catch (error) {
-      
+      console.log(error.message)
     }
   }
   const previewAvatar = async (e)=>{
@@ -20,6 +27,7 @@ function App() {
     // setImage(file)
     const base64 = await converBase64(file)
     // console.log(base64.split(',')[1]);
+    setImageURL(base64.split(',')[1])
     setImage(base64)
   }
   const converBase64 = (file)=>{
@@ -34,8 +42,9 @@ function App() {
       }
     })
   }
-  const removeImage = ()=>{
+  const removeImage = () =>{
     setImage('')
+    setText('')
   }
   return (
     <div className="App">
@@ -57,8 +66,10 @@ function App() {
                   <button type="button" className="remove-image" onClick={removeImage}>Remove <span className="image-title">Uploaded Image</span></button>
                   <button type="submit" className="train-image">Training <span className="image-title">Uploaded Image</span></button>
                 </div>
+
               </React.Fragment>
             }
+            {text && <h1>{text}</h1>}
           </div>
         </form>
       </div>
